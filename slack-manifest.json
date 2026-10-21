@@ -1,0 +1,45 @@
+{
+  "display_information": {
+    "name": "CaseStudyBot",
+    "description": "Surfaces the right X creative strategy case studies from the master Drive folder",
+    "background_color": "#000000",
+    "long_description": "Tag @CaseStudyBot with a brand, vertical, product/strategy, or cultural moment and it returns 3-5 case study decks (exact title + Google Drive link) from the Creative Strategy master folder. Example: @CaseStudyBot Trend Genius case study for the CPG vertical."
+  },
+  "features": {
+    "app_home": {
+      "home_tab_enabled": false,
+      "messages_tab_enabled": true,
+      "messages_tab_read_only_enabled": false
+    },
+    "bot_user": {
+      "display_name": "CaseStudyBot",
+      "always_online": true
+    }
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "app_mentions:read",
+        "chat:write",
+        "channels:history",
+        "groups:history",
+        "im:history",
+        "mpim:history"
+      ]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "bot_events": [
+        "app_mention",
+        "message.im"
+      ]
+    },
+    "interactivity": {
+      "is_enabled": false
+    },
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": true,
+    "token_rotation_enabled": false
+  }
+}
