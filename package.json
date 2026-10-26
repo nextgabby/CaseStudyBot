@@ -1,10 +1,10 @@
 {
   "name": "x-case-study-bot",
   "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
   "scripts": {
+    "dev": "node index.js",
     "start": "node index.js",
-    "dev": "node --watch index.js",
     "check-drive": "node scripts/check-drive.js",
     "ask": "node scripts/ask.js"
   },
@@ -12,17 +12,20 @@
     "slack",
     "grok",
     "google-drive",
-    "case-studies"
+    "case-studies",
+    "vercel"
   ],
-  "author": "",
   "license": "ISC",
-  "description": "CaseStudyBot — Slack bot that surfaces X creative strategy case studies from the master Google Drive folder using Grok",
+  "description": "CaseStudyBot — Slack bot that surfaces X creative strategy case studies from the master Google Drive folder using Grok. Runs on Vercel.",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "@slack/bolt": "^4.7.3",
+    "@slack/web-api": "^8.2.0",
+    "@vercel/functions": "^3.10.3",
     "dotenv": "^17.4.2",
+    "google-auth-library": "^11.0.0",
     "googleapis": "^187.0.0"
   }
 }

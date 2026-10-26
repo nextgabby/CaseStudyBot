@@ -50,6 +50,8 @@ const FILE_FIELDS =
 function buildAuth() {
   const scopes = ["https://www.googleapis.com/auth/drive.readonly"];
   const {
+    GCP_WORKLOAD_IDENTITY_AUDIENCE,
+    GCP_SERVICE_ACCOUNT_EMAIL,
     GOOGLE_SERVICE_ACCOUNT_JSON,
     GOOGLE_SERVICE_ACCOUNT_JSON_B64,
     GOOGLE_APPLICATION_CREDENTIALS,
@@ -57,6 +59,28 @@ function buildAuth() {
     GOOGLE_OAUTH_CLIENT_SECRET,
     GOOGLE_OAUTH_REFRESH_TOKEN,
   } = process.env;
+
+  // Keyless on Vercel: Workload Identity Federation. Vercel issues an OIDC
+  // token per request; GCP's STS exchanges it for a short-lived token that
+  // impersonates the service account. No key material anywhere.
+  if (GCP_WORKLOAD_IDENTITY_AUDIENCE) {
+    if (!GCP_SERVICE_ACCOUNT_EMAIL) {
+      throw new Error("GCP_WORKLOAD_IDENTITY_AUDIENCE is set but GCP_SERVICE_ACCOUNT_EMAIL is missing");
+    }
+    const { ExternalAccountClient } = require("google-auth-library");
+    const { getVercelOidcToken } = require("@vercel/functions/oidc");
+    const auth = ExternalAccountClient.fromJSON({
+      type: "external_account",
+      audience: GCP_WORKLOAD_IDENTITY_AUDIENCE,
+      subject_token_type: "urn:ietf:params:oauth:token-type:jwt",
+      token_url: "https://sts.googleapis.com/v1/token",
+      service_account_impersonation_url:
+        `https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${GCP_SERVICE_ACCOUNT_EMAIL}:generateAccessToken`,
+      subject_token_supplier: { getSubjectToken: () => getVercelOidcToken() },
+    });
+    auth.scopes = scopes;
+    return { auth, mode: `workload-identity-federation → ${GCP_SERVICE_ACCOUNT_EMAIL}` };
+  }
 
   if (GOOGLE_OAUTH_REFRESH_TOKEN) {
     if (!GOOGLE_OAUTH_CLIENT_ID || !GOOGLE_OAUTH_CLIENT_SECRET) {
