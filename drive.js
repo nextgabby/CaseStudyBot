@@ -94,10 +94,14 @@ function buildAuth() {
       mode: `service-account file (${GOOGLE_APPLICATION_CREDENTIALS})`,
     };
   }
-  throw new Error(
-    "No Google credentials configured. Set GOOGLE_SERVICE_ACCOUNT_JSON_B64, GOOGLE_SERVICE_ACCOUNT_JSON, " +
-      "GOOGLE_APPLICATION_CREDENTIALS, or GOOGLE_OAUTH_* (see .env.example)."
-  );
+  // Keyless: Application Default Credentials. On Cloud Run / GCE this is the
+  // service account attached to the service; locally it is whatever
+  // `gcloud auth application-default login` set up. Also covers Workload
+  // Identity Federation credential files via GOOGLE_APPLICATION_CREDENTIALS.
+  return {
+    auth: new google.auth.GoogleAuth({ scopes }),
+    mode: "application-default-credentials (attached identity / WIF)",
+  };
 }
 
 let _drive = null;
